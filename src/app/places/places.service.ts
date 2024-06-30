@@ -1,3 +1,4 @@
+import { ErrorService } from './../shared/error.service';
 import { inject, Injectable, signal } from '@angular/core';
 
 import { Place } from './place.model';
@@ -9,6 +10,7 @@ import { catchError, map, tap, throwError } from 'rxjs';
 })
 export class PlacesService {
   private httpClient = inject(HttpClient);
+  private errorService = inject(ErrorService);
   private userPlaces = signal<Place[]>([]);
 
   loadedUserPlaces = this.userPlaces.asReadonly();
@@ -47,6 +49,7 @@ export class PlacesService {
       .pipe(
         catchError((error) => {
           this.userPlaces.set(prevPlaces);
+          this.errorService.showError('Failed to update user');
           return throwError(() => new Error('Failed to update user'));
         })
       );
